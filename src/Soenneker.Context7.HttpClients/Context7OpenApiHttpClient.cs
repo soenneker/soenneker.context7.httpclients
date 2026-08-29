@@ -11,7 +11,7 @@ using Soenneker.Utils.HttpClientCache.Abstract;
 
 namespace Soenneker.Context7.HttpClients;
 
-///<inheritdoc cref="IContext7OpenApiHttpClient"/>
+/// <inheritdoc cref="IContext7OpenApiHttpClient"/>
 public sealed class Context7OpenApiHttpClient : IContext7OpenApiHttpClient
 {
     private readonly IHttpClientCache _httpClientCache;
