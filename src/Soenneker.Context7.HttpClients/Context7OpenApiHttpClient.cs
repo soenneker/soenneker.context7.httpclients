@@ -16,8 +16,9 @@ public sealed class Context7OpenApiHttpClient : IContext7OpenApiHttpClient
 {
     private readonly IHttpClientCache _httpClientCache;
     private readonly IConfiguration _config;
+    private readonly string _cacheKey = $"{nameof(Context7OpenApiHttpClient)}:{Guid.NewGuid():N}";
 
-    private const string _prodBaseUrl = "https://context7.com/api";
+    private const string _prodBaseUrl = "https://context7.com/api/";
 
     public Context7OpenApiHttpClient(IHttpClientCache httpClientCache, IConfiguration config)
     {
@@ -27,7 +28,7 @@ public sealed class Context7OpenApiHttpClient : IContext7OpenApiHttpClient
 
     public ValueTask<HttpClient> Get(CancellationToken cancellationToken = default)
     {
-        return _httpClientCache.Get(nameof(Context7OpenApiHttpClient), (config: _config, baseUrl: _config["Context7:ClientBaseUrl"] ?? _prodBaseUrl), static state =>
+        return _httpClientCache.Get(_cacheKey, (config: _config, baseUrl: _config["Context7:ClientBaseUrl"] ?? _prodBaseUrl), static state =>
         {
             var apiKey = state.config.GetValueStrict<string>("Context7:ApiKey");
             string authHeaderName = state.config["Context7:AuthHeaderName"] ?? "Authorization";
@@ -36,7 +37,7 @@ public sealed class Context7OpenApiHttpClient : IContext7OpenApiHttpClient
 
             return new HttpClientOptions
             {
-                BaseAddress = new Uri(state.baseUrl),
+                BaseAddress = new Uri(state.baseUrl.TrimEnd('/') + '/'),
                 DefaultRequestHeaders = new Dictionary<string, string>
                 {
                     {authHeaderName, authHeaderValue},
@@ -47,11 +48,11 @@ public sealed class Context7OpenApiHttpClient : IContext7OpenApiHttpClient
 
     public void Dispose()
     {
-        _httpClientCache.RemoveSync(nameof(Context7OpenApiHttpClient));
+        _httpClientCache.RemoveSync(_cacheKey);
     }
 
     public ValueTask DisposeAsync()
     {
-        return _httpClientCache.Remove(nameof(Context7OpenApiHttpClient));
+        return _httpClientCache.Remove(_cacheKey);
     }
 }
