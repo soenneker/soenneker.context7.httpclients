@@ -30,7 +30,7 @@ public sealed class Context7OpenApiHttpClient : IContext7OpenApiHttpClient
     {
         return _httpClientCache.Get(_cacheKey, (config: _config, baseUrl: _config["Context7:ClientBaseUrl"] ?? _prodBaseUrl), static state =>
         {
-            var apiKey = state.config.GetValueStrict<string>("Context7:ApiKey");
+            var apiKey = state.config.GetStringStrict("Context7:ApiKey");
             string authHeaderName = state.config["Context7:AuthHeaderName"] ?? "Authorization";
             string authHeaderValueTemplate = state.config["Context7:AuthHeaderValueTemplate"] ?? "Bearer {token}";
             string authHeaderValue = authHeaderValueTemplate.Replace("{token}", apiKey, StringComparison.Ordinal);
